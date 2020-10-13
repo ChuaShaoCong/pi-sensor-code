@@ -21,6 +21,8 @@ file = path.open()
 floorcode = file.read()
 floorcode = floorcode.strip()
 
+t = dt.datetime.now()
+
 while(True):
     statusChanged = False;
 
@@ -59,6 +61,17 @@ while(True):
 
     res = ''.join(str(e) for e in status)
 
+    delta = dt.datetime.now()-t
+    if delta.seconds >= 60 or statusChanged: #Update a new row every minute, or when status is changed
+        t = dt.datetime.now()  # Update 't' variable to new time
+    
+        timestampObj = calendar.timegm(time.gmtime()) #for timestamp formatting
+        timestamp = dt.datetime.fromtimestamp(timestampObj).isoformat()
+        
+        with open('Logging.csv','a') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow([timestamp,status[0],status[1],status[2],status[3],statusChanged]) #append a new row containing timestamp and status of 4 machines, statusChanged
+        
     if (statusChanged):
         print("change detected")
         print(res)
